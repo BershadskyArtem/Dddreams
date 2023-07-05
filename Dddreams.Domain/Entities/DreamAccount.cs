@@ -2,7 +2,7 @@
 
 namespace Dddreams.Domain.Entities;
 
-public class DreamsAccount : BaseEntity
+public class DreamsAccount : BaseEntity, IAggregateRoot
 {
     public List<Dream> Dreams { get; set; } = new();
     public List<Comment> Comments { get; set; } = new();
