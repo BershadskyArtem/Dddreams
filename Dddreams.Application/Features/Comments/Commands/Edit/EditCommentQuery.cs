@@ -7,5 +7,5 @@ namespace Dddreams.Application.Features.Comments.Commands.Edit;
 public class EditCommentQuery : BaseAuditableQuery<bool>
 {
     public Guid CommentId { get; set; }
-    public Comment NewData { get; set; }
+    public string NewContent { get; set; } = string.Empty;
 }

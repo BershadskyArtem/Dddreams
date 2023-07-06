@@ -9,35 +9,31 @@ public class CreateDreamCommandHandler : IRequestHandler<CreateDreamCommand, Dre
 {
     private readonly IDreamsRepository _dreamsRepository;
     private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-
-    public CreateDreamCommandHandler(IDreamsRepository dreamsRepository, IUserRepository userRepository)
+    public CreateDreamCommandHandler(IDreamsRepository dreamsRepository, IUserRepository userRepository, IUnitOfWork unitOfWork)
     {
         _dreamsRepository = dreamsRepository;
         _userRepository = userRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Dream> Handle(CreateDreamCommand request, CancellationToken cancellationToken)
     {
-        var allowedToPost = await _userRepository.AllowedToPost(request.WhoRequested);
+        var whoRequested = await _userRepository.GetByIdAsync(request.WhoRequested);
 
-        if (!allowedToPost)
+        if (whoRequested == null)
+            throw new BadRequestException("You do not exist...");
+
+        if (!whoRequested.CanPost)
             throw new BadRequestException("You are not allowed to post.");
-
-        var dream = new Dream
-        {
-            Description = request.Description,
-            Id = Guid.NewGuid(),
-            CreatedDate = DateTime.UtcNow,
-            IllustrationUrl = request.IllustrationUrl,
-            Title = request.Title,
-            Visibility = request.Visibility,
-            AuthorId = request.WhoRequested
-        };
         
-        await _dreamsRepository.CreateAsync(dream);
-        await _dreamsRepository.SaveChangesAsync();
+        var createdDream = whoRequested.AddDream(request.Title, request.Description, request.IllustrationUrl, request.TimeOfDream,
+            request.Visibility);
         
-        return dream;
+        await _dreamsRepository.CreateAsync(createdDream);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        return createdDream;
     }
 }

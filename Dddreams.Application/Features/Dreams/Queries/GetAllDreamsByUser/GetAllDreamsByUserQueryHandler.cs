@@ -1,4 +1,5 @@
-﻿using Dddreams.Application.Helpers;
+﻿using Dddreams.Application.Common.Exceptions;
+using Dddreams.Application.Helpers;
 using Dddreams.Application.Interfaces.Repositories;
 using Dddreams.Domain.Entities;
 using Dddreams.Domain.Enums;
@@ -22,16 +23,28 @@ public class GetAllDreamsByUserQueryHandler : IRequestHandler<GetAllDreamsByUser
     {
         var requesterRole = (await _userRepository.GetRole(request.WhoRequested));
 
-        if (request.DreamsAuthor == request.WhoRequested || ModerationAccessHelper.CanSeePrivateDreams(requesterRole))
-            return await _dreamsRepository.GetAllByUserAsync(request.DreamsAuthor);
+        if (requesterRole == null)
+            throw new BadRequestException("You do not exist.");
+
+        if (request.DreamsAuthor == request.WhoRequested ||
+            ModerationAccessHelper.CanSeePrivateDreams((DreamsRole)requesterRole))
+        {
+            var allPosts = await _dreamsRepository.GetAllByUserAsync(request.DreamsAuthor);
+            
+            return allPosts ?? new List<Dream>();
+        }
         
         var areFriends = await _userRepository.AreFriends(request.DreamsAuthor, request.WhoRequested);
 
-        if (!areFriends && !ModerationAccessHelper.CanSeeForFriendsDreams(requesterRole))
-            return await _dreamsRepository.GetAllPublicByUserAsync(request.DreamsAuthor);
-        
+        if (!areFriends && !ModerationAccessHelper.CanSeeForFriendsDreams((DreamsRole)requesterRole))
+        {
+            var publicPosts =  await _dreamsRepository.GetAllPublicByUserAsync(request.DreamsAuthor);
+
+
+            return publicPosts ?? new List<Dream>();
+        }
         var publicAndForFriends = await _dreamsRepository.GetAllPublicOrForFriendsByUserAsync(request.DreamsAuthor);
         
-        return publicAndForFriends.ToList();
+        return publicAndForFriends ?? new List<Dream>();
     }
 }
