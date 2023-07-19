@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Dddreams.Application.Features.Comments.Commands.Edit;
 
-public class EditCommentQueryHandler : IRequestHandler<EditCommentQuery, bool>
+public class EditCommentQueryHandler : IRequestHandler<EditCommentCommand, bool>
 {
     private readonly ICommentsRepository _commentsRepository;
     private readonly IUserRepository _userRepository;
@@ -19,7 +19,7 @@ public class EditCommentQueryHandler : IRequestHandler<EditCommentQuery, bool>
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<bool> Handle(EditCommentQuery request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(EditCommentCommand request, CancellationToken cancellationToken)
     {
         var requesterRole = await _userRepository.GetRole(request.WhoRequested);
         
@@ -39,6 +39,8 @@ public class EditCommentQueryHandler : IRequestHandler<EditCommentQuery, bool>
             throw new BadRequestException("You are not allowed to edit this comment.");
 
         comment.Edit(request.NewContent);
+
+        _commentsRepository.Update(comment);
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         

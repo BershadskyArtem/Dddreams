@@ -2,7 +2,7 @@
 
 namespace Dddreams.Application.Features.Comments.Commands.Like;
 
-public class LikeCommentQuery : BaseAuditableQuery<bool>
+public class LikeCommentCommand : BaseAuditableQuery<bool>
 {
     public Guid CommentId { get; set; }
 }

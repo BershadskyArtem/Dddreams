@@ -13,7 +13,4 @@ public class EditDreamCommand : BaseAuditableQuery<bool>
     public string IllustrationUrl { get; set; } = string.Empty;
     public DateTime TimeOfDream { get; set; }
     public VisibilityKind Visibility { get; set; }
-    
-    public Dream NewData { get; set; }
-    
 }

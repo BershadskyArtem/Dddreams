@@ -8,11 +8,17 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.9">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Controllers" />
+      <ProjectReference Include="..\Dddreams.Application\Dddreams.Application.csproj" />
+      <ProjectReference Include="..\Dddreams.Infrastructure\Dddreams.Infrastructure.csproj" />
+      <ProjectReference Include="..\Ddreams.Persistence\Ddreams.Persistence.csproj" />
     </ItemGroup>
 
 </Project>

@@ -35,4 +35,9 @@ public class CommentsRepository : ICommentsRepository
         var result = await _dbContext.Comments.FirstOrDefaultAsync(comment => comment.Id == id);
         return result;
     }
+
+    public void Update(Comment comment)
+    {
+        _dbContext.Comments.Update(comment);
+    }
 }

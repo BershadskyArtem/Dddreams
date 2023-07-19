@@ -21,7 +21,7 @@ public class UserRepository : IUserRepository
         var user = await _dbContext.Users
             .AsNoTracking()
             .Include(user => user.Friends)
-            .FirstOrDefaultAsync(user => user.Id == otherId);
+            .FirstOrDefaultAsync(user => user.Id == id);
 
         var friend = user?.Friends.FirstOrDefault(friend => friend.Id == otherId);
 

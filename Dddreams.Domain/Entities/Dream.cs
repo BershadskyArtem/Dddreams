@@ -11,16 +11,15 @@ public class Dream : BaseEntity, IAggregateRoot
     public string IllustrationUrl { get; private set; } = string.Empty;
     public DateTime TimeOfDream { get; private set; }
     public VisibilityKind Visibility { get; private set; } = VisibilityKind.Private;
-
     public IReadOnlyList<Comment> Comments => _comments.ToList();
     public IReadOnlyList<Like> Likes => _likes.ToList();
-
-    public bool Locked { get; private set; }
-    public Guid LockedBy { get; private set; }
-
+    public bool Locked { get; private set; } = false;
+    public Guid? LockedBy { get; private set; }
+    public bool Banned { get; private set; } = false;
+    
     private List<Comment> _comments { get; set; } = new();
     private List<Like> _likes { get; set; } = new();
-    public bool Banned { get; private set; }
+    
 
     public static Dream Create(DreamsAccount author, string title, string description, string illustrationUrl,
         DateTime timeOfDream, VisibilityKind visibility)
@@ -63,11 +62,10 @@ public class Dream : BaseEntity, IAggregateRoot
         return like;
     }
 
-    public void Unlike(DreamsAccount whoRequested)
+    public Like? Unlike(DreamsAccount whoRequested)
     {
         var like = _likes.Find(l => l.Author.Id == whoRequested.Id);
-        if (like == null)
-            return;
+        return like;
     }
 
 
@@ -91,5 +89,14 @@ public class Dream : BaseEntity, IAggregateRoot
         IllustrationUrl = illustrationUrl;
         TimeOfDream = timeOfDream;
         Visibility = visibility;
+    }
+
+    public void Update(string title, string description, DateTime timeOfDream, string illustrationUrl, VisibilityKind visibility)
+    {
+        Title = title;
+        Description = description;
+        TimeOfDream = timeOfDream;
+        IllustrationUrl = illustrationUrl;
+        Visibility = visibility;    
     }
 }

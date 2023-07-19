@@ -6,4 +6,19 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Dddreams.Application\Dddreams.Application.csproj" />
+      <ProjectReference Include="..\Ddreams.Persistence\Ddreams.Persistence.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.9" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.9" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.9" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.9" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.9" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.31.0" />
+    </ItemGroup>
+
 </Project>

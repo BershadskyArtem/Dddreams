@@ -14,4 +14,5 @@ public interface IDreamsRepository
     public Task<bool> CreateAsync(Dream dream);
     public Task<bool> UpdateDreamAsync(Dream post);
     public Task<bool> DeleteDreamAsync(Guid id);
+    void Edit(Dream dream);
 }

@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Dddreams.Application.Features.Comments.Commands.Create;
 
-public class CreateCommentQueryHandler : IRequestHandler<CreateCommentQuery, bool>
+public class CreateCommentQueryHandler : IRequestHandler<CreateCommentCommand, bool>
 {
     
     private readonly IUserRepository _userRepository;
@@ -19,7 +19,7 @@ public class CreateCommentQueryHandler : IRequestHandler<CreateCommentQuery, boo
         _dreamsRepository = dreamsRepository;
     }
 
-    public async Task<bool> Handle(CreateCommentQuery request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
     {
         var whoRequested = await _userRepository.GetByIdAsync(request.WhoRequested);
 

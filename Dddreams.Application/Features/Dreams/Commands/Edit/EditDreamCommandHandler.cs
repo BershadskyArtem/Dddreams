@@ -22,7 +22,7 @@ public class EditDreamCommandHandler : IRequestHandler<EditDreamCommand, bool>
 
     public async Task<bool> Handle(EditDreamCommand request, CancellationToken cancellationToken)
     {
-        var oldPost = await _dreamsRepository.GetByIdAsync(request.NewData.Id);
+        var oldPost = await _dreamsRepository.GetByIdAsync(request.DreamId);
 
         if (oldPost == null)
             throw new NotFoundException("Post does not exist.");
@@ -39,7 +39,7 @@ public class EditDreamCommandHandler : IRequestHandler<EditDreamCommand, bool>
         if (isLocked)
         {
             var whoLocked = oldPost.LockedBy;
-            var lockerRole = await _userRepository.GetRole(whoLocked);
+            var lockerRole = await _userRepository.GetRole((Guid)whoLocked);
 
             if (lockerRole == null)
                 throw new BadRequestException("Locker id is not present in db.");
@@ -47,8 +47,10 @@ public class EditDreamCommandHandler : IRequestHandler<EditDreamCommand, bool>
             var allowed = ModerationAccessHelper.HigherStuffThan((DreamsRole)userRole, (DreamsRole)lockerRole);
             
             if (!allowed) return false;
+
+            oldPost.Update(request.Title, request.Description, request.TimeOfDream, request.IllustrationUrl, request.Visibility);
             
-            await _dreamsRepository.UpdateDreamAsync(request.NewData);
+            await _dreamsRepository.UpdateDreamAsync(oldPost);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return true;
         }
@@ -66,6 +68,8 @@ public class EditDreamCommandHandler : IRequestHandler<EditDreamCommand, bool>
 
 
         dream.Edit(request.Title, request.Description, request.IllustrationUrl, request.TimeOfDream, request.Visibility);
+
+        _dreamsRepository.Edit(dream);
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 

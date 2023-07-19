@@ -4,20 +4,22 @@ using MediatR;
 
 namespace Dddreams.Application.Features.Dreams.Commands.UnlikeDream;
 
-public class UnlikeDreamQueryHandler : IRequestHandler<UnlikeDreamQuery, bool>
+public class UnlikeDreamCommandHandler : IRequestHandler<UnlikeDreamCommand, bool>
 {
     private readonly IDreamsRepository _dreamsRepository;
     private readonly IUserRepository _userRepository;
+    private readonly ILikesRepository _likesRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public UnlikeDreamQueryHandler(IDreamsRepository dreamsRepository, IUserRepository userRepository, IUnitOfWork unitOfWork)
+    public UnlikeDreamCommandHandler(IDreamsRepository dreamsRepository, IUserRepository userRepository, IUnitOfWork unitOfWork, ILikesRepository likesRepository)
     {
         _dreamsRepository = dreamsRepository;
         _userRepository = userRepository;
         _unitOfWork = unitOfWork;
+        _likesRepository = likesRepository;
     }
 
-    public async Task<bool> Handle(UnlikeDreamQuery request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(UnlikeDreamCommand request, CancellationToken cancellationToken)
     {
         var whoRequested = await _userRepository.GetByIdAsync(request.WhoRequested);
         
@@ -29,7 +31,12 @@ public class UnlikeDreamQueryHandler : IRequestHandler<UnlikeDreamQuery, bool>
         if (dream == null)
             throw new BadRequestException("Dream does not exist");
         
-        dream.Unlike(whoRequested);
+        var like = dream.Unlike(whoRequested);
+
+        if (like == null)
+            return false;   
+        
+        _likesRepository.Delete(like);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 

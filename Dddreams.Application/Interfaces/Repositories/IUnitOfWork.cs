@@ -1,6 +1,4 @@
-﻿using Dddreams.Domain.Common;
-
-namespace Dddreams.Application.Interfaces.Repositories;
+﻿namespace Dddreams.Application.Interfaces.Repositories;
 
 public interface IUnitOfWork
 {

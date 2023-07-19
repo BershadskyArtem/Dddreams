@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Dddreams.Application.Features.Comments.Commands.Edit;
 
-public class EditCommentQuery : BaseAuditableQuery<bool>
+public class EditCommentCommand : BaseAuditableQuery<bool>
 {
     public Guid CommentId { get; set; }
     public string NewContent { get; set; } = string.Empty;

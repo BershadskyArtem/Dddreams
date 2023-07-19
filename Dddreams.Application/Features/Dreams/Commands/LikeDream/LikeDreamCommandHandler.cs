@@ -5,20 +5,22 @@ using MediatR;
 
 namespace Dddreams.Application.Features.Dreams.Commands.LikeDream;
 
-public class LikeDreamQueryCommand : IRequestHandler<LikeDreamQuery, bool>
+public class LikeDreamCommandHandler : IRequestHandler<LikeDreamCommand, bool>
 {
     private readonly IDreamsRepository _dreamsRepository;
     private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ILikesRepository _likesRepository;
 
-    public LikeDreamQueryCommand(IDreamsRepository dreamsRepository, IUserRepository userRepository, IUnitOfWork unitOfWork)
+    public LikeDreamCommandHandler(IDreamsRepository dreamsRepository, IUserRepository userRepository, IUnitOfWork unitOfWork, ILikesRepository likesRepository)
     {
         _dreamsRepository = dreamsRepository;
         _userRepository = userRepository;
         _unitOfWork = unitOfWork;
+        _likesRepository = likesRepository;
     }
 
-    public async Task<bool> Handle(LikeDreamQuery request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(LikeDreamCommand request, CancellationToken cancellationToken)
     {
         var postToLike = await _dreamsRepository.GetByIdAsync(request.DreamId);
         var whoRequested = await _userRepository.GetByIdAsync(request.WhoRequested);
@@ -38,6 +40,8 @@ public class LikeDreamQueryCommand : IRequestHandler<LikeDreamQuery, bool>
             return false;
 
         var like = postToLike.AddLike(whoRequested);
+
+        await _likesRepository.AddAsync(like);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 

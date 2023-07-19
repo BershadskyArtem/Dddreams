@@ -10,4 +10,16 @@ public class UserToken
     public string RefreshToken { get; set; } = string.Empty;
     public bool IsSuccess { get; set; } = false;
     public List<string> Errors { get; set; } = new();
+
+    public static UserToken Fail(params string[] errors) => new UserToken
+    {
+        Errors = errors.ToList(),
+        IsSuccess = false
+    };
+    
+    public static UserToken Fail(List<string> errors ) => new UserToken
+    {
+        Errors = errors,
+        IsSuccess = false
+    };
 }

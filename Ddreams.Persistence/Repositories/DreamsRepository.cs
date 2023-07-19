@@ -67,7 +67,7 @@ public class DreamsRepository : IDreamsRepository
             .Include(dream => dream.Author)
             .Include(dream => dream.Comments)
             .Include(dream => dream.Likes)
-            .FirstOrDefaultAsync(dream => dream.Author.Id == id);
+            .FirstOrDefaultAsync(dream => dream.Id == id);
     }
 
     public async Task<bool> CreateAsync(Dream dream)
@@ -90,5 +90,10 @@ public class DreamsRepository : IDreamsRepository
 
         _dbContext.Dreams.Remove(d);
         return true;
+    }
+
+    public void Edit(Dream dream)
+    {
+        _dbContext.Dreams.Update(dream);    
     }
 }

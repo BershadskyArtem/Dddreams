@@ -7,10 +7,12 @@ public class Comment : BaseEntity, IAggregateRoot
 {
     public Dream Parent { get; private set; } = null!;
     public Guid AuthorId { get; private set; }
+    public DreamsAccount Author { get; private set; }
     public IReadOnlyList<Like> Likes => _likes.ToList();
     public string Content { get; private set; }
-
+    public Guid CommentableId { get; set; }
     private List<Like> _likes { get; set; } = new();
+    
 
     public static Comment Create(Guid authorId, Dream parent, string content)
     {
@@ -36,14 +38,16 @@ public class Comment : BaseEntity, IAggregateRoot
     {
     }
 
-    public void Unlike(DreamsAccount user)
+    public Like? Unlike(DreamsAccount user)
     {
         var like = _likes.Find(l => l.Author.Id == user.Id);
 
         if (like == null)
-            return;
+            return null;
         
         _likes.Remove(like);
+
+        return like;
     }
 
     public bool Edit(string newContent)

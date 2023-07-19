@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Dddreams.Application.Features.Comments.Commands.Delete;
 
-public class DeleteCommentQuery : BaseAuditableQuery<bool>
+public class DeleteCommentCommand : BaseAuditableQuery<bool>
 {
     public Guid CommentId { get; set; }
 }

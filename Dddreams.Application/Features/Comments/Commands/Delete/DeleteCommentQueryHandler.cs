@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Dddreams.Application.Features.Comments.Commands.Delete;
 
-public class DeleteCommentQueryHandler : IRequestHandler<DeleteCommentQuery, bool>
+public class DeleteCommentQueryHandler : IRequestHandler<DeleteCommentCommand, bool>
 {
     private readonly IUserRepository _userRepository;
     private readonly ICommentsRepository _commentsRepository;
@@ -21,7 +21,7 @@ public class DeleteCommentQueryHandler : IRequestHandler<DeleteCommentQuery, boo
         _dreamsRepository = dreamsRepository;
     }
 
-    public async Task<bool> Handle(DeleteCommentQuery request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeleteCommentCommand request, CancellationToken cancellationToken)
     {
         var requesterRole = await _userRepository.GetRole(request.WhoRequested);
         

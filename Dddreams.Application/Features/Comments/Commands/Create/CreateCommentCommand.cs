@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Dddreams.Application.Features.Comments.Commands.Create;
 
-public class CreateCommentQuery : BaseAuditableQuery<bool>
+public class CreateCommentCommand : BaseAuditableQuery<bool>
 {
     public string Content { get; set; }
     public Guid DreamId { get; set; }

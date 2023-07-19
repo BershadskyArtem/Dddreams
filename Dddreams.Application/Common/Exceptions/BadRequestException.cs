@@ -1,6 +1,6 @@
 ﻿namespace Dddreams.Application.Common.Exceptions;
 
-public class BadRequestException : Exception
+public class BadRequestException : ApplicationException
 {
     public string[] Errors { get; set; } 
     
