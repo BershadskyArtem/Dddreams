@@ -23,13 +23,14 @@ public class LikeDreamCommandHandler : IRequestHandler<LikeDreamCommand, bool>
     public async Task<bool> Handle(LikeDreamCommand request, CancellationToken cancellationToken)
     {
         var postToLike = await _dreamsRepository.GetByIdAsync(request.DreamId);
+        
+        if (postToLike == null)
+            throw new BadRequestException("Post does not exist");
+        
         var whoRequested = await _userRepository.GetByIdAsync(request.WhoRequested);
 
         if (whoRequested == null)
             throw new BadRequestException("You do not exist");
-        
-        if (postToLike == null)
-            throw new BadRequestException("Post does not exist");
         
         if (postToLike.Visibility == VisibilityKind.Private && !(request.WhoRequested == postToLike.Author.Id))
             return false;
@@ -39,10 +40,15 @@ public class LikeDreamCommandHandler : IRequestHandler<LikeDreamCommand, bool>
         if (postToLike.Visibility == VisibilityKind.AllFriends && !areFriends)
             return false;
 
-        var like = postToLike.AddLike(whoRequested);
+        var like = postToLike.AddLike(whoRequested.Id);
 
-        await _likesRepository.AddAsync(like);
+        await _dreamsRepository.UpdateDreamAsync(postToLike);
+        
+        var success = await _likesRepository.AddAsync(like);
 
+        if (!success)
+            throw new BadRequestException("You already liked this post");
+        
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return true;

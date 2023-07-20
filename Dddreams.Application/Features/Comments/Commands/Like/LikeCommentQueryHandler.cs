@@ -33,11 +33,15 @@ public class LikeCommentQueryHandler : IRequestHandler<LikeCommentCommand, bool>
         if (comment == null)
             throw new BadRequestException("Comment that you are trying to like does not exist");
 
-        var like = comment.AddLike(user);
+        var like = comment.AddLike(user.Id);
+        
         _commentsRepository.Update(comment);
-        await _likesRepository.AddAsync(like);
+
+        if (!await _likesRepository.AddAsync(like))
+            throw new BadRequestException("You already liked this Comment.");
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+        
         return true;
     }
 }

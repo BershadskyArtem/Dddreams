@@ -8,4 +8,5 @@ public interface ICommentsRepository
     public Task<List<Comment>> GetAllFromPostPagination(Guid postId, int pageSize, int pageNumber);
     Task<Comment?> GetByIdAsync(Guid id);
     void Update(Comment comment);
+    Task<bool> Delete(Comment comment);
 }

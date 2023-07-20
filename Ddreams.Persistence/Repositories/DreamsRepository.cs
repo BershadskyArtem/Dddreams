@@ -19,8 +19,6 @@ public class DreamsRepository : IDreamsRepository
     {
         return await _dbContext.Dreams  
             .Include(dream => dream.Author)
-            .Include(dream => dream.Comments)
-            .Include(dream => dream.Likes)
             .Where(dream => dream.Author.Id == userId).ToListAsync();
     }
 
@@ -28,8 +26,6 @@ public class DreamsRepository : IDreamsRepository
     {
         return await _dbContext.Dreams
             .Include(dream => dream.Author)
-            .Include(dream => dream.Comments)
-            .Include(dream => dream.Likes)
             .Where(dream => dream.Author.Id == userId)
             .Where(dream => dream.Visibility == VisibilityKind.Public)
             .ToListAsync();
@@ -54,8 +50,6 @@ public class DreamsRepository : IDreamsRepository
     {
         return await _dbContext.Dreams
             .Include(dream => dream.Author)
-            .Include(dream => dream.Comments)
-            .Include(dream => dream.Likes)
             .Where(dream => dream.Author.Id == userId)
             .Where(dream => dream.Visibility == VisibilityKind.Public || dream.Visibility == VisibilityKind.AllFriends)
             .ToListAsync();
@@ -65,8 +59,6 @@ public class DreamsRepository : IDreamsRepository
     {
         return await _dbContext.Dreams
             .Include(dream => dream.Author)
-            .Include(dream => dream.Comments)
-            .Include(dream => dream.Likes)
             .FirstOrDefaultAsync(dream => dream.Id == id);
     }
 

@@ -17,7 +17,6 @@ public class CommentsRepository : ICommentsRepository
     public async Task<List<Comment>> GetAllFromPost(Guid postId)
     {
         var result = await _dbContext.Comments
-            .Include(p => p.Likes)
             .Include(p => p.Parent)
             .Where(comment => comment.Parent.Id == postId)
             .ToListAsync();
@@ -39,5 +38,11 @@ public class CommentsRepository : ICommentsRepository
     public void Update(Comment comment)
     {
         _dbContext.Comments.Update(comment);
+    }
+
+    public Task<bool> Delete(Comment comment)
+    {
+        _dbContext.Comments.Remove(comment);
+        return Task.FromResult(true);
     }
 }

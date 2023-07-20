@@ -39,12 +39,18 @@ public class DeleteCommentQueryHandler : IRequestHandler<DeleteCommentCommand, b
         if (!canDelete)
             throw new BadRequestException("You are not allowed to edit this post");
 
-        var parent = await _dreamsRepository.GetByIdAsync(comment.Parent.Id);
 
-        if (parent == null)
-            throw new NotFoundException("Cannot find parent of the comment. Please report this error.");
+        await _commentsRepository.Delete(comment);
+        
 
-        parent.DeleteComment(comment);
+        // var parent = await _dreamsRepository.GetByIdAsync(comment.Parent.Id);
+        //
+        // if (parent == null)
+        //     throw new NotFoundException("Cannot find parent of the comment. Please report this error.");
+        //
+        // parent.DeleteComment(comment);
+        
+        
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         

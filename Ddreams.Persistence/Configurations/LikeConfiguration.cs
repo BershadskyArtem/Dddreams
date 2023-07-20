@@ -9,7 +9,8 @@ public class LikeConfiguration : IEntityTypeConfiguration<Like>
     public void Configure(EntityTypeBuilder<Like> builder)
     {
         builder.HasKey(d => d.Id);
-        builder.HasOne(l => l.Author)
-            .WithMany(a => a.Likes);
+        builder.HasOne<DreamsAccount>()
+            .WithMany()
+            .HasForeignKey(d => d.AuthorId);
     }
 }

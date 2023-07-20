@@ -17,19 +17,18 @@ public class UserAuthService : IUserAuthService
 {
     private readonly UserManager<DreamsAccount> _userManager;
     private readonly AuthConfiguration _authConfiguration;
-    private readonly TokenValidationParameters _tokenValidationParameters;
+    private readonly TokenValidationParametersStore _tokenValidationParametersStore;
     private readonly IRefreshTokensRepository _refreshTokensRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public UserAuthService(UserManager<DreamsAccount> userManager, AuthConfiguration authConfiguration,
-        IRefreshTokensRepository refreshTokensRepository, IUnitOfWork unitOfWork,
-        TokenValidationParameters tokenValidationParameters)
+        IRefreshTokensRepository refreshTokensRepository, IUnitOfWork unitOfWork, TokenValidationParametersStore tokenValidationParametersStore)
     {
         _userManager = userManager;
         _authConfiguration = authConfiguration;
         _refreshTokensRepository = refreshTokensRepository;
         _unitOfWork = unitOfWork;
-        _tokenValidationParameters = tokenValidationParameters;
+        _tokenValidationParametersStore = tokenValidationParametersStore;
     }
 
     public async Task<UserToken> RegisterUserAsync(RegisterAccountCommand request)
@@ -94,8 +93,8 @@ public class UserAuthService : IUserAuthService
         var expiryUtc = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         expiryUtc = expiryUtc.AddSeconds(expiresInSecondFromBase);
         
-        if(expiryUtc > DateTime.UtcNow)
-            return UserToken.Fail("Token has not expired yet.");
+        //if(expiryUtc > DateTime.UtcNow)
+        //    return UserToken.Fail("Token has not expired yet.");
 
         var jwi = tokenPrinciple.Claims.GetClaimValue(JwtRegisteredClaimNames.Jti);
         var storedRefreshToken = await _refreshTokensRepository.GetByIdAsync(jwi);
@@ -133,7 +132,7 @@ public class UserAuthService : IUserAuthService
         
         try
         {
-            var principal = handler.ValidateToken(token, _tokenValidationParameters, out var validatedToken);
+            var principal = handler.ValidateToken(token, _tokenValidationParametersStore.ValidatorForRefresh, out var validatedToken);
             return !IsValidJwtSecurityAlgorithm(validatedToken) ? null : principal;
         }
         catch (Exception e)
@@ -155,12 +154,12 @@ public class UserAuthService : IUserAuthService
 
         if (user.Email == null)
             throw new ApplicationException("Something went horribly wrong here!");
-        
 
+        var refreshTokenId = Guid.NewGuid();
         var claims = new List<Claim>()
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Jti, refreshTokenId.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
             new Claim(Claims.Accounts.Id, user.Id.ToString()),
         };
@@ -179,6 +178,7 @@ public class UserAuthService : IUserAuthService
         var token = tokenHandler.CreateToken(tokenDescriptor);
         var refreshToken = new RefreshToken
         {
+            Id = refreshTokenId,
             JwtId = token.Id,
             //User = user,
             CreationDate = DateTime.UtcNow,

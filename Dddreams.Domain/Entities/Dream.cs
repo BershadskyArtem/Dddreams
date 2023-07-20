@@ -11,16 +11,13 @@ public class Dream : BaseEntity, IAggregateRoot
     public string IllustrationUrl { get; private set; } = string.Empty;
     public DateTime TimeOfDream { get; private set; }
     public VisibilityKind Visibility { get; private set; } = VisibilityKind.Private;
-    public IReadOnlyList<Comment> Comments => _comments.ToList();
-    public IReadOnlyList<Like> Likes => _likes.ToList();
     public bool Locked { get; private set; } = false;
     public Guid? LockedBy { get; private set; }
     public bool Banned { get; private set; } = false;
-    
-    private List<Comment> _comments { get; set; } = new();
-    private List<Like> _likes { get; set; } = new();
-    
 
+    public int LikesAmount { get; set; } = 0;
+    
+    
     public static Dream Create(DreamsAccount author, string title, string description, string illustrationUrl,
         DateTime timeOfDream, VisibilityKind visibility)
     {
@@ -32,7 +29,8 @@ public class Dream : BaseEntity, IAggregateRoot
             Description = description,
             IllustrationUrl = illustrationUrl,
             TimeOfDream = timeOfDream,
-            Visibility = visibility
+            Visibility = visibility,
+            LikesAmount = 0
         };
 
         return result;
@@ -48,40 +46,31 @@ public class Dream : BaseEntity, IAggregateRoot
         Banned = true;
     }
 
+    public Like AddLike(Guid whoLiked)
+    {
+        LikesAmount++;
+        return Like.Create(whoLiked, Id, LikableKind.Dream);
+    }
+
+
+    public bool RemoveLike(Guid authorId, out Like? l)
+    {
+        if (LikesAmount == 0)
+        {
+            l = null;
+            return false;
+        }
+            
+        LikesAmount--;
+        l = Like.Create(authorId, Id, LikableKind.Dream);
+        return true;
+    }
+    
     public Comment AddComment(Guid authorId, string content)
     {
-        var comment = Comment.Create(authorId, this, content);
-        _comments.Add(comment);
-        return comment;
+        return Comment.Create(authorId, this, content);
     }
-
-    public Like AddLike(DreamsAccount whoLiked)
-    {
-        var like = Like.Create(whoLiked, this.Id, LikableKind.Dream);
-        _likes.Add(like);
-        return like;
-    }
-
-    public Like? Unlike(DreamsAccount whoRequested)
-    {
-        var like = _likes.Find(l => l.Author.Id == whoRequested.Id);
-        return like;
-    }
-
-
-    private Dream()
-    {
-    }
-
-
-    public void DeleteComment(Comment comment)
-    {
-        var exist = _comments.Find(c => c.Id == comment.Id);
-        if (exist == null)
-            return;
-        _comments.Remove(exist);
-    }
-
+    
     public void Edit(string title, string description, string illustrationUrl, DateTime timeOfDream, VisibilityKind visibility)
     {
         Title = title;
@@ -98,5 +87,9 @@ public class Dream : BaseEntity, IAggregateRoot
         TimeOfDream = timeOfDream;
         IllustrationUrl = illustrationUrl;
         Visibility = visibility;    
+    }
+    
+    private Dream()
+    {
     }
 }

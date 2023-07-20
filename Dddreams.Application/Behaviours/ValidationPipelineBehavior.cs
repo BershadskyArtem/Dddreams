@@ -1,7 +1,7 @@
 ﻿using Dddreams.Application.Common.Exceptions;
 using FluentValidation;
 using MediatR;
-using ApplicationException = System.ApplicationException;
+using ApplicationException = Dddreams.Application.Common.Exceptions.ApplicationException;
 
 namespace Dddreams.Application.Behaviours;
 

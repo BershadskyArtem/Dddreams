@@ -30,13 +30,16 @@ public class UnlikeCommentQueryHandler : IRequestHandler<UnlikeCommentCommand, b
         
         if (comment == null)
             throw new BadRequestException("Comment does not exist");
+
+        Domain.Entities.Like? like = null;
+        var successfullUnlike = comment.Unlike(user.Id, out like);
+
+        if (!successfullUnlike)
+            throw new BadRequestException("You did not liked this dream to begin with.");
         
-        var like = comment.Unlike(user);
-
-        if (like == null)
-            return false;   
-
-        _likesRepository.Delete(like);
+        _commentsRepository.Update(comment);
+        
+        _likesRepository.Delete(like!);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         

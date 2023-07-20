@@ -20,7 +20,7 @@ public class DreamsAccountConfiguration : IEntityTypeConfiguration<DreamsAccount
             .HasForeignKey(c => c.AuthorId);
 
         builder.HasMany(d => d.Likes)
-            .WithOne(c => c.Author);
+            .WithOne().HasForeignKey(d => d.AuthorId);
 
         builder.HasMany(d => d.Friends);
 

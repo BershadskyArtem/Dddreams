@@ -1,5 +1,7 @@
 ﻿using Dddreams.Application.Common.Exceptions;
 using Dddreams.Application.Interfaces.Repositories;
+using Dddreams.Domain.Entities;
+using Dddreams.Domain.Enums;
 using MediatR;
 
 namespace Dddreams.Application.Features.Dreams.Commands.UnlikeDream;
@@ -30,14 +32,15 @@ public class UnlikeDreamCommandHandler : IRequestHandler<UnlikeDreamCommand, boo
 
         if (dream == null)
             throw new BadRequestException("Dream does not exist");
-        
-        var like = dream.Unlike(whoRequested);
 
-        if (like == null)
-            return false;   
-        
+        Like? like = null;
+        var successfulRemoval = dream.RemoveLike(whoRequested.Id, out like);
+
+        if (!successfulRemoval)
+            throw new BadRequestException("You did not liked this post.");
+
         _likesRepository.Delete(like);
-
+        
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return false;

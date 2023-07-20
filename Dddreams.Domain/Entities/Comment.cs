@@ -8,10 +8,9 @@ public class Comment : BaseEntity, IAggregateRoot
     public Dream Parent { get; private set; } = null!;
     public Guid AuthorId { get; private set; }
     public DreamsAccount Author { get; private set; }
-    public IReadOnlyList<Like> Likes => _likes.ToList();
     public string Content { get; private set; }
     public Guid CommentableId { get; set; }
-    private List<Like> _likes { get; set; } = new();
+    public int LikesCount { get; set; }
     
 
     public static Comment Create(Guid authorId, Dream parent, string content)
@@ -26,11 +25,10 @@ public class Comment : BaseEntity, IAggregateRoot
         return result;
     }
 
-    public Like AddLike(DreamsAccount user)
+    public Like AddLike(Guid user)
     {
-        var like = Like.Create(user, Id, LikableKind.Comment);
-        _likes.Add(like);
-        return like;
+        LikesCount++;
+        return Like.Create(user, Id, LikableKind.Comment);
     }
 
 
@@ -38,16 +36,16 @@ public class Comment : BaseEntity, IAggregateRoot
     {
     }
 
-    public Like? Unlike(DreamsAccount user)
+    public bool Unlike(Guid whoLiked, out Like? like)
     {
-        var like = _likes.Find(l => l.Author.Id == user.Id);
-
-        if (like == null)
-            return null;
-        
-        _likes.Remove(like);
-
-        return like;
+        if (LikesCount <= 0)
+        {
+            like = null;
+            return false;
+        }
+        LikesCount--;
+        like = Like.Create(whoLiked, Id, LikableKind.Comment);
+        return true;
     }
 
     public bool Edit(string newContent)

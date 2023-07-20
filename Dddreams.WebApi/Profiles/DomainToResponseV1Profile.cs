@@ -14,23 +14,10 @@ public class DomainToResponseV1Profile : Profile
         CreateMap<Dream, DreamResponse>()
             .ForMember(x => x.Visibility, opt => { opt.MapFrom(f => ToDtoVisibility(f.Visibility)); })
             .ForMember(x => x.AuthorId, opt => opt.MapFrom(f => f.Author.Id))
-            .ForMember(x => x.FirstComments,
-                opt =>
-            {
-                opt.MapFrom(
-                    (f,_,_,ctx) =>
-                        {
-                            return f.Comments.Take(3).Select(com => ctx.Mapper.Map<CommentResponse>(com)).ToList();
-                        }
-                    );
-            });
-        
-        
-        CreateMap<Comment, CommentResponse>()
-            .ForMember(x => x.LikesCount, opt =>
-            {
-                opt.MapFrom(f => f.Likes.Count());
-            });
+            .ForMember(x => x.LikesCount, opt => opt.MapFrom(x => x.LikesAmount));
+
+
+        CreateMap<Comment, CommentResponse>();
 
         CreateMap<List<Dream>, DreamsByUserResponse>()
             .ForMember(d => d.Dreams,

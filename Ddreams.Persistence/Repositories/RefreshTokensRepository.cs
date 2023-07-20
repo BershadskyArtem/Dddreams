@@ -21,7 +21,8 @@ public class RefreshTokensRepository : IRefreshTokensRepository
 
     public Task<RefreshToken?> GetByIdAsync(string id)
     {
-        return _dbContext.RefreshTokens.SingleOrDefaultAsync(dream => dream.Token == id);
+        var i = Guid.Parse(id);
+        return _dbContext.RefreshTokens.SingleOrDefaultAsync(dream => dream.Id == i);
     }
 
     public void Update(RefreshToken token)

@@ -39,7 +39,7 @@ public static class InfrastructureServiceCollectionExtensions
             Key = key
         };
         
-        var tokenValidationParams = new TokenValidationParameters()
+        var tokenFullValidationParams = new TokenValidationParameters()
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Key)),
@@ -48,8 +48,20 @@ public static class InfrastructureServiceCollectionExtensions
             RequireExpirationTime = false,
             ValidateLifetime = true
         };
+        
+        var tokenOnRefreshValidationParams = new TokenValidationParameters()
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Key)),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            RequireExpirationTime = false,
+            ValidateLifetime = false
+        };
 
-        services.AddSingleton(tokenValidationParams);
+        var tokenStore = new TokenValidationParametersStore(tokenFullValidationParams, tokenOnRefreshValidationParams);
+
+        services.AddSingleton(tokenStore);
         
         services.AddAuthentication(opt =>
         {
@@ -59,7 +71,7 @@ public static class InfrastructureServiceCollectionExtensions
         }).AddJwtBearer(opt =>
         {
             opt.SaveToken = true;
-            opt.TokenValidationParameters = tokenValidationParams;
+            opt.TokenValidationParameters = tokenFullValidationParams;
             opt.Events = new JwtBearerEvents()
             {
                 OnAuthenticationFailed = c =>

@@ -18,14 +18,10 @@ public class DreamConfiguration : IEntityTypeConfiguration<Dream>
 
         builder.HasIndex(d => d.Title);
 
-        builder
-            .HasMany(d => d.Likes)
-            .WithOne()
-            .HasForeignKey(d => d.LikableId);
-
-
-        builder.HasMany(d => d.Comments)
-            .WithOne(d => d.Parent);
+        //Causes conflicts in DB 
+        // builder
+        //     .HasMany(d => d.Likes)
+        //     .WithOne();
 
 
 

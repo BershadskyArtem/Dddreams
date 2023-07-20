@@ -4,6 +4,7 @@ namespace Dddreams.Application.Interfaces.Repositories;
 
 public interface ILikesRepository
 {
-    Task AddAsync(Like like);
+    Task<bool> AddAsync(Like like);
     void Delete(Like like);
+    Task<bool> DeleteByUserId(Guid whoLiked);
 }

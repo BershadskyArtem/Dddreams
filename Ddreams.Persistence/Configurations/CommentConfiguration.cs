@@ -9,10 +9,9 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
     public void Configure(EntityTypeBuilder<Comment> builder)
     {
         builder.HasKey(d => d.Id);
-        
-        builder.HasMany(c => c.Likes)
-            .WithOne()
-            .HasForeignKey(d => d.LikableId);
+
+        //Causes conflicts in DB
+        // builder.HasMany(c => c.Likes);
 
         builder.HasOne(c => c.Author)
             .WithMany()
